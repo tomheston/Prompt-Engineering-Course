@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using Claude Well: A Guide for Health Professions Students</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --surface2: #f1efe9;
+    --border: #e2ddd5;
+    --text: #1a1814;
+    --text-muted: #6b6560;
+    --accent: #2d5a8e;
+    --accent-light: #e8f0f9;
+    --accent2: #7c3d12;
+    --accent2-light: #fdf0e8;
+    --green: #1a5c3a;
+    --green-light: #e8f5ee;
+    --red: #8b2020;
+    --red-light: #fdf0f0;
+    --yellow: #7a5c0a;
+    --yellow-light: #fdf8e8;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 0 24px;
+  }
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 12px 0;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    background: none;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: var(--accent); color: white; }
+
+  /* SECTIONS */
+  section {
+    display: none;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  section.active { display: block; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #1a3a5c 0%, #2d5a8e 60%, #4a7ab5 100%);
+    color: white;
+    border-radius: var(--radius);
+    padding: 48px 40px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .hero-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    font-size: 16px;
+    opacity: 0.85;
+    max-width: 540px;
+    line-height: 1.65;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .card-title { font-size: 18px; font-weight: 600; line-height: 1.3; }
+  .card-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-text { font-size: 14px; line-height: 1.6; }
+  .callout-text strong { display: block; margin-bottom: 4px; font-size: 14px; }
+  .callout.blue { background: var(--accent-light); border-left: 3px solid var(--accent); }
+  .callout.green { background: var(--green-light); border-left: 3px solid var(--green); }
+  .callout.amber { background: var(--yellow-light); border-left: 3px solid var(--yellow); }
+  .callout.red { background: var(--red-light); border-left: 3px solid var(--red); }
+
+  /* STEP SEQUENCE */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    counter-increment: step;
+    width: 32px; height: 32px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-num::before { content: counter(step); }
+  .step-body h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .step-body p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  /* PROMPT CARDS */
+  .prompt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  @media (max-width: 600px) { .prompt-grid { grid-template-columns: 1fr; } }
+
+  .prompt-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .prompt-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-light);
+    transform: translateY(-1px);
+  }
+  .prompt-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .prompt-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+  .prompt-preview { font-size: 13px; color: var(--text-muted); line-height: 1.5; font-style: italic; }
+  .copy-hint {
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .prompt-card:hover .copy-hint { opacity: 1; }
+
+  /* MODAL */
+  .modal-bg {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .modal-bg.open { display: flex; align-items: flex-start; justify-content: center; padding-top: 60px; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    padding: 32px;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: var(--surface2); border: none; cursor: pointer;
+    width: 32px; height: 32px; border-radius: 50%;
+    font-size: 18px; display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+  }
+  .modal-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .modal h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .modal-why { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+  .prompt-text {
+    background: #1a1814;
+    color: #e8e4dc;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 14px;
+    line-height: 1.65;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+  }
+  .copy-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s;
+  }
+  .copy-btn:hover { background: #1e4070; }
+  .copy-btn.copied { background: var(--green); }
+
+  /* BEFORE/AFTER */
+  .ba-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  @media (max-width: 600px) { .ba-container { grid-template-columns: 1fr; } }
+  .ba-box { border-radius: 10px; padding: 20px; }
+  .ba-box.before { background: var(--red-light); border: 1px solid #f0c0c0; }
+  .ba-box.after { background: var(--green-light); border: 1px solid #a0d8b8; }
+  .ba-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .ba-box.before .ba-label { color: var(--red); }
+  .ba-box.after .ba-label { color: var(--green); }
+  .ba-box p { font-size: 14px; line-height: 1.6; font-style: italic; color: var(--text); }
+
+  /* PRINCIPLES LIST */
+  .principle {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 16px;
+  }
+  .principle:last-child { border-bottom: none; }
+  .principle-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--border);
+    line-height: 1;
+    min-width: 32px;
+    font-family: 'Playfair Display', serif;
+  }
+  .principle-body h4 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .principle-body p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .section-sub { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+  .badge-blue { background: var(--accent-light); color: var(--accent); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-amber { background: var(--yellow-light); color: var(--yellow); }
+
+  h3 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+  h4 { font-size: 16px; font-weight: 600; }
+  p { font-size: 15px; line-height: 1.65; }
+  ul { padding-left: 20px; }
+  li { font-size: 14px; line-height: 1.7; color: var(--text-muted); }
+  li strong { color: var(--text); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="show('home')">Overview</button>
+    <button class="nav-btn" onclick="show('commit')">Commit → Consult</button>
+    <button class="nav-btn" onclick="show('challenge')">Challenge Claude</button>
+    <button class="nav-btn" onclick="show('prompts')">Prompt Library</button>
+    <button class="nav-btn" onclick="show('principles')">Core Principles</button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<section id="home" class="active">
+  <div class="hero">
+    <div class="hero-label">Health Professions · AI Literacy</div>
+    <h1>Using Claude Well</h1>
+    <p>AI is a tool, not a clinician. This guide teaches you to think harder alongside AI — not to outsource your thinking to it.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="card" style="cursor:pointer" onclick="show('commit'); document.querySelectorAll('.nav-btn')[1].classList.add('active'); document.querySelectorAll('.nav-btn')[0].classList.remove('active')">
+      <div class="card-header">
+        <div class="card-icon" style="background:#e8f0f9">🎯</div>
+        <div>
+          <div class="card-title">Commit → Consult</div>
+          <div class="card-subtitle">The AMA's Augmented Intelligence principle</div>
+        </div>
+      </div>
+      <p style="font-size:14px; color:var(--text-muted)">Form your own answer before you ask Claude. This one habit separates students who learn from students who outsource.</p>
+    </div>
+
+    <div class="card" style="cursor:pointer" onclick="show('challenge'); document.querySelectorAll('.nav-btn')[2].classList.add('active'); document.querySelectorAll('.nav-btn')[0].classList.remove('active')">
+      <div class="card-header">
+        <div class="card-icon" style="background:#fdf0e8">⚡</div>
+        <div>
+          <div class="card-title">Challenge Claude</div>
+          <div class="card-subtitle">Claude is often confident. It is not always right.</div>
+        </div>
+      </div>
+      <p style="font-size:14px; color:var(--text-muted)">Learn the prompts that force Claude to find its own weaknesses, contradictions, and unsupported claims.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:#e8f5ee">📋</div>
+      <div>
+        <div class="card-title">Prompt Library</div>
+        <div class="card-subtitle">Copy-ready prompts for critical engagement</div>
+      </div>
+    </div>
+    <p style="font-size:14px; color:var(--text-muted); margin-bottom:14px">Seven tested prompts for getting better answers, exposing weak reasoning, and stress-testing Claude's responses. Each one is copy-ready.</p>
+    <button class="copy-btn" onclick="show('prompts'); document.querySelectorAll('.nav-btn')[3].classList.add('active'); document.querySelectorAll('.nav-btn')[0].classList.remove('active')">Go to Prompt Library →</button>
+  </div>
+
+  <div class="callout blue">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text">
+      <strong>What this guide is for</strong>
+      Claude can help you research, draft, reason through clinical problems, and pressure-test your thinking. But it has no license, no accountability, and no access to your patient. The judgment is always yours.
+    </div>
+  </div>
+</section>
+
+<!-- COMMIT CONSULT -->
+<section id="commit">
+  <div class="section-title">Commit → Consult</div>
+  <div class="section-sub">The single most important habit for learning with AI — grounded in the AMA's position on Augmented Intelligence.</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:#e8f0f9">📄</div>
+      <div>
+        <div class="card-title">The AMA Position (2018)</div>
+        <div class="badge badge-blue" style="margin-top:4px">Augmented Intelligence</div>
+      </div>
+    </div>
+    <p style="margin-bottom:14px">The American Medical Association drew a deliberate distinction: not <em>Artificial</em> Intelligence — <strong>Augmented</strong> Intelligence. The goal is to <strong>enhance</strong> physician judgment, not replace it.</p>
+    <p>That framing has a direct implication for how you use tools like Claude: the human brings the judgment; the tool amplifies it. If you skip the judgment step, you've lost what makes the tool clinically safe.</p>
+  </div>
+
+  <h3>The Habit in Practice</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Read the question. Close Claude.</h4>
+        <p>Before you type anything, formulate your own answer. Write it down — even a rough version. "I think this is X because Y." This takes 60–90 seconds and is non-negotiable.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Commit to your answer</h4>
+        <p>Your answer is now on record. You can't pretend you "already knew" after reading Claude's response. The commit step forces honest learning.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Consult Claude — and share your answer first</h4>
+        <p>Start your prompt with what you already think: <em>"My working answer is X. Here's my reasoning: [brief]. Where am I right, where am I off, and what am I missing?"</em> This gets you a far better response.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Compare — don't just absorb</h4>
+        <p>Read Claude's response against your own. Where do you agree? Where does Claude say something different? Do you find Claude's reasoning persuasive — or are you just deferring because it sounds authoritative?</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Update your answer with attribution</h4>
+        <p>If Claude changes your mind, note specifically <em>why</em>. "Claude pointed out X, which I hadn't considered, and that changes my answer to Y." This is intellectual honesty — and it's what attending physicians will expect from you.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ba-container" style="margin-top:28px">
+    <div class="ba-box before">
+      <div class="ba-label">❌ What most students do</div>
+      <p>"Hey Claude, what's the first-line treatment for hypertension in pregnancy?"</p>
+      <p style="margin-top:10px; font-size:13px; color:#8b2020">Claude answers. Student copies. Student has no idea if the answer is right, current, or complete — but it sounds authoritative, so they accept it.</p>
+    </div>
+    <div class="ba-box after">
+      <div class="ba-label">✓ What you should do</div>
+      <p>"My answer: labetalol or nifedipine, avoid ACE inhibitors. I'm less sure about the threshold for treatment — is it 150/100 or 160/110? Here's my reasoning: [brief note]. What am I getting right and what am I missing?"</p>
+    </div>
+  </div>
+
+  <div class="callout amber">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-text">
+      <strong>The anchoring trap</strong>
+      Research on clinical reasoning shows that the first answer you see tends to anchor your thinking — even when you consciously know to evaluate it critically. If you read Claude first, that becomes your anchor. Commit first, and you're the anchor.
+    </div>
+  </div>
+</section>
+
+<!-- CHALLENGE -->
+<section id="challenge">
+  <div class="section-title">Challenge Claude</div>
+  <div class="section-sub">Claude presents answers with confidence and apparent authority. That confidence is not evidence of accuracy. Here's how to stress-test what Claude tells you.</div>
+
+  <div class="callout red">
+    <div class="callout-icon">🔴</div>
+    <div class="callout-text">
+      <strong>What Claude cannot do</strong>
+      Claude has no access to current literature (its training data has a cutoff), no access to your patient, and no way to be held accountable for a wrong answer. It is also trained to sound helpful and confident — which can be dangerous when it's wrong.
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px">
+    <h4 style="margin-bottom:14px">Why challenging works</h4>
+    <p style="font-size:14px; color:var(--text-muted)">Claude can criticize its own answers — often very effectively — when explicitly asked. Left to its own devices, it optimizes for a helpful, coherent response. When you ask it to find weaknesses, it shifts into a different mode. Use that mode deliberately.</p>
+  </div>
+
+  <h3 style="margin-top:28px">When Claude changes its answer</h3>
+  <p style="font-size:14px; color:var(--text-muted); margin-bottom:20px">Not all pushback should change Claude's answer. If you give Claude a false counter-argument and it immediately capitulates, that's a sign Claude is being sycophantic, not thoughtful. This matters for your reasoning too: practice distinguishing valid counter-arguments from weak ones.</p>
+
+  <div class="ba-container">
+    <div class="ba-box before">
+      <div class="ba-label">🚩 Sycophantic capitulation</div>
+      <p><em>You:</em> "Actually I think the answer is B, not A."</p>
+      <p style="margin-top:8px"><em>Claude:</em> "You're absolutely right! B is definitely the better answer. I should have said that initially."</p>
+      <p style="margin-top:10px; font-size:13px; color:#8b2020">Claude changed its answer because you pushed back — not because you gave it a reason to. This is a failure mode. Push back and ask why.</p>
+    </div>
+    <div class="ba-box after">
+      <div class="ba-label">✓ Principled updating</div>
+      <p><em>You:</em> "Actually I think the answer is B — the half-life is longer, so dosing frequency is different."</p>
+      <p style="margin-top:8px"><em>Claude:</em> "That's a valid point about half-life. It changes my recommendation for dosing interval, though the first-line choice remains A because..."</p>
+    </div>
+  </div>
+
+  <div class="callout blue" style="margin-top:24px">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text">
+      <strong>Use this prompt when testing Claude's reasoning:</strong>
+      "When playing devil's advocate, I'm testing your reasoning — not giving you the answer. Hold your position unless the counter-argument is genuinely stronger on its merits. If you change your answer, explain exactly which specific point broke your original logic."
+    </div>
+  </div>
+</section>
+
+<!-- PROMPTS -->
+<section id="prompts">
+  <div class="section-title">Prompt Library</div>
+  <div class="section-sub">Seven prompts for critical engagement. Click any card to see the full prompt and copy it.</div>
+
+  <div class="prompt-grid">
+
+    <div class="prompt-card" onclick="openModal(0)">
+      <div class="prompt-tag">Quality Ratchet</div>
+      <div class="prompt-title">The 6/10 → 10/10 Upgrade</div>
+      <div class="prompt-preview">"That answer was a 6/10. What would a 10/10 answer look like?..."</div>
+      <div class="copy-hint">Click to view & copy →</div>
+    </div>
+
+    <div class="prompt-card" onclick="openModal(1)">
+      <div class="prompt-tag">Internal Audit</div>
+      <div class="prompt-title">Find the Contradictions</div>
+      <div class="prompt-preview">"Read your response and find any internal contradictions, vague claims, or unsupported assertions..."</div>
+      <div class="copy-hint">Click to view & copy →</div>
+    </div>
+
+    <div class="prompt-card" onclick="openModal(2)">
+      <div class="prompt-tag">Self-Critique</div>
+      <div class="prompt-title">The 3 Biggest Weaknesses</div>
+      <div class="prompt-preview">"List the 3 biggest weaknesses in the response you just gave me. Be specific and brutal..."</div>
+      <div class="copy-hint">Click to view & copy →</div>
+    </div>
+
+    <div class="prompt-card" onclick="openModal(3)">
+      <div class="prompt-tag">Steel Man</div>
+      <div class="prompt-title">Devil's Advocate</div>
+      <div class="prompt-preview">"Play devil's advocate against your own answer. What would the strongest critic say?..."</div>
+      <div class="copy-hint">Click to view & copy →</div>
+    </div>
+
+    <div class="prompt-card" onclick="openModal(4)">
+      <div class="prompt-tag">Reasoning Guard</div>
+      <div class="prompt-title">Hold Your Position</div>
+      <div class="prompt-preview">"When playing devil's advocate, I'm testing your reasoning — not giving you the answer..."</div>
+      <div class="copy-hint">Click to view & copy →</div>
+    </div>
+
+    <div class="prompt-card" onclick="openModal(5)">
+      <div class="prompt-tag">Expert Panel</div>
+      <div class="prompt-title">3 Domain Expert Reviews</div>
+      <div class="prompt-preview">"Imagine 3 domain experts reviewed your answer. What would each of them push back on?..."</div>
+      <div class="copy-hint">Click to view & copy →</div>
+    </div>
+
+    <div class="prompt-card" onclick="openModal(6)">
+      <div class="prompt-tag">Assumption Audit</div>
+      <div class="prompt-title">List Every Assumption</div>
+      <div class="prompt-preview">"List every assumption baked into your previous response. Flag which ones are weak or unverified..."</div>
+      <div class="copy-hint">Click to view & copy →</div>
+    </div>
+
+    <div class="prompt-card" style="border-style:dashed; cursor:default; opacity:0.6">
+      <div class="prompt-tag">Pro Tip</div>
+      <div class="prompt-title">Start with your own answer</div>
+      <div class="prompt-preview">Before using any of these prompts, tell Claude what you already think. The critique will be sharper.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PRINCIPLES -->
+<section id="principles">
+  <div class="section-title">Core Principles</div>
+  <div class="section-sub">What it means to use AI as a health professional — not just a student.</div>
+
+  <div class="card">
+    <div class="principle">
+      <div class="principle-num">1</div>
+      <div class="principle-body">
+        <h4>Your judgment is the product</h4>
+        <p>What residency programs, attending physicians, and licensing boards are evaluating is your clinical reasoning — not your ability to find answers. Claude can help you think; it cannot think for you.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">2</div>
+      <div class="principle-body">
+        <h4>Confidence ≠ accuracy</h4>
+        <p>Claude generates fluent, confident-sounding text. That fluency is a property of language models, not a marker of correctness. The more authoritative something sounds, the more important it is to verify it.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">3</div>
+      <div class="principle-body">
+        <h4>AI doesn't know what it doesn't know</h4>
+        <p>Claude can produce a plausible-sounding citation to a paper that doesn't exist. It can describe a drug interaction that isn't real. It doesn't flag these failures unless you ask. Always verify clinical facts against primary sources.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">4</div>
+      <div class="principle-body">
+        <h4>The question shapes the answer</h4>
+        <p>Claude responds to what you ask, not what you need. A lazy question ("what's the treatment for X?") gets a generic answer. A good question ("my working answer is X — where am I wrong?") gets a targeted, useful answer. Prompt quality is a clinical skill.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">5</div>
+      <div class="principle-body">
+        <h4>Accountability doesn't transfer</h4>
+        <p>If you act on something Claude told you and it's wrong, Claude bears no responsibility. No license is at stake for Claude. Build the habit of treating AI responses the way you'd treat an eager medical student's answer: useful input, requires verification.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">6</div>
+      <div class="principle-body">
+        <h4>Augmented Intelligence is a practice, not a feature</h4>
+        <p>The AMA framing isn't about the technology — it's about the physician's posture toward it. You practice augmented intelligence every time you commit before you consult, every time you push back on a confident answer, every time you use Claude to find the flaws in your own reasoning.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout green" style="margin-top:8px">
+    <div class="callout-icon">✅</div>
+    <div class="callout-text">
+      <strong>The goal</strong>
+      You should leave this course a sharper thinker who uses AI fluently — not a faster typer who lets AI do the thinking. Those are very different trajectories. Only one of them produces a good physician.
+    </div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeModalBg(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-tag" id="modal-tag"></div>
+    <h3 id="modal-title"></h3>
+    <p class="modal-why" id="modal-why"></p>
+    <div class="prompt-text" id="modal-prompt"></div>
+    <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy prompt</button>
+  </div>
+</div>
+
+<script>
+const prompts = [
+  {
+    tag: "Quality Ratchet",
+    title: "The 6/10 → 10/10 Upgrade",
+    why: "Forces Claude to identify what it held back. A first response is often 'good enough' — this prompt demands the version it would give to an expert reviewer.",
+    text: "That answer was a 6/10. What would a 10/10 answer look like? What's missing? Now write the 10/10 version."
+  },
+  {
+    tag: "Internal Audit",
+    title: "Find the Contradictions",
+    why: "Medical writing must be internally consistent. This prompt asks Claude to audit its own logic before you act on it — catching hedged language, unsupported claims, and contradictory statements.",
+    text: "Read your response and find any internal contradictions, vague claims, or unsupported assertions. Mark them. Then give me a version that eliminates all of them."
+  },
+  {
+    tag: "Self-Critique",
+    title: "The 3 Biggest Weaknesses",
+    why: "Asking for 'weaknesses' gets platitudes. Asking for the 3 biggest, with the instruction to be 'specific and brutal,' forces a qualitatively different and more useful critique.",
+    text: "List the 3 biggest weaknesses in the response you just gave me. Be specific and brutal. Then rewrite it fixing those weaknesses."
+  },
+  {
+    tag: "Steel Man",
+    title: "Devil's Advocate",
+    why: "In clinical reasoning, the ability to generate and evaluate the strongest competing hypothesis is essential. This prompt builds that muscle — using Claude's own answer as the subject.",
+    text: "Play devil's advocate against your own answer. What would the strongest critic say? Now revise your response to address those criticisms."
+  },
+  {
+    tag: "Reasoning Guard",
+    title: "Hold Your Position",
+    why: "Claude has a known failure mode: it capitulates when challenged, even when the challenge is weak. This prompt explicitly instructs Claude to hold its position unless the counter-argument genuinely earns a change. Use it at the start of a debate session.",
+    text: "When playing devil's advocate, I'm testing your reasoning — not giving you the answer. Hold your position unless the counter-argument is genuinely stronger on its merits. If you change your answer, explain exactly which specific evidence point broke your original logic."
+  },
+  {
+    tag: "Expert Panel",
+    title: "3 Domain Expert Reviews",
+    why: "Medical questions sit at the intersection of multiple specialties. This prompt simulates multi-disciplinary review — the kind you get on rounds, but on demand.",
+    text: "Imagine 3 domain experts reviewed your answer. What would each of them push back on? What would they add? Now give me a version that passes all 3 expert reviews."
+  },
+  {
+    tag: "Assumption Audit",
+    title: "List Every Assumption",
+    why: "Every clinical argument rests on assumptions — about the patient, the population, the evidence base. Making assumptions explicit is both a reasoning skill and a patient safety habit.",
+    text: "List every assumption baked into your previous response. Flag which ones are weak or unverified. Now rewrite with those assumptions either defended or removed."
+  }
+];
+
+function show(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const idx = ['home','commit','challenge','prompts','principles'].indexOf(id);
+  if (idx >= 0) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function openModal(i) {
+  const p = prompts[i];
+  document.getElementById('modal-tag').textContent = p.tag;
+  document.getElementById('modal-title').textContent = p.title;
+  document.getElementById('modal-why').textContent = p.why;
+  document.getElementById('modal-prompt').textContent = p.text;
+  const btn = document.getElementById('copy-btn');
+  btn.textContent = 'Copy prompt';
+  btn.classList.remove('copied');
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+function closeModalBg(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModal();
+}
+
+function copyPrompt() {
+  const text = document.getElementById('modal-prompt').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy prompt'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
